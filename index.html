@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seabird Society Redevelopment Hub</title>
+<style>
+    :root { --brand: #1e3a8a; --brand-light: #2563eb; }
+    * { box-sizing: border-box; }
+    body { font-family: Arial, Helvetica, sans-serif; background-color: #f0f2f5; color: #333; margin: 0; padding: 0; }
+    .hidden { display: none !important; }
+
+    /* ---------- Login ---------- */
+    .login-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .login-box { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,.1); max-width: 400px; width: 100%; border: 1px solid #e4e6eb; text-align: center; margin: auto; }
+    h1 { color: var(--brand); margin: 0 0 5px; font-size: 26px; }
+    .subtitle { color: #65676b; font-size: 14px; margin: 0 0 25px; }
+    .form-group { text-align: left; margin-bottom: 15px; }
+    label { display: block; font-weight: bold; font-size: 14px; margin-bottom: 5px; color: #4b5563; }
+    select, input { width: 100%; padding: 12px; border: 1px solid #ccd0d5; border-radius: 8px; background-color: #f5f6f7; font-size: 15px; font-family: inherit; }
+    select:focus, input:focus { outline: 2px solid var(--brand-light); outline-offset: 1px; background: #fff; }
+    .login-box > button { width: 100%; margin-top: 5px; }
+
+    /* ---------- Buttons ---------- */
+    button { background-color: #1d4ed8; color: #fff; padding: 10px 20px; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; font-family: inherit; }
+    button:hover { background-color: #1e40af; }
+    .logout-btn { background-color: #111827; }
+    .logout-btn:hover { background-color: #374151; }
+    .btn-small { padding: 8px 12px; font-size: 13px; background-color: #475569; }
+    .btn-small:hover { background-color: #334155; }
+    .btn-secondary { background: #e5e7eb; color: #374151; }
+    .btn-secondary:hover { background: #d1d5db; }
+
+    /* ---------- Header ---------- */
+    header { background-color: var(--brand); color: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; box-shadow: 0 2px 4px rgba(0,0,0,.1); }
+    .header-title { font-size: 20px; font-weight: bold; margin: 0; }
+    .badge { display: inline-block; background-color: var(--brand-light); color: #fff; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-top: 5px; }
+
+    /* ---------- Layout ---------- */
+    .main-content { max-width: 1100px; margin: 30px auto 60px; padding: 0 20px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    .card { background: #fff; padding: 25px; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 2px 4px rgba(0,0,0,.05); text-decoration: none; color: inherit; display: block; transition: transform .15s, box-shadow .15s; cursor: pointer; }
+    .card:hover, .card:focus { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.1); outline: none; border-color: #c7d2fe; }
+    .card-icon { font-size: 30px; margin-bottom: 10px; }
+    .card h3 { margin: 0 0 5px; color: #1f2937; font-size: 18px; }
+    .card p { margin: 0; color: #6b7280; font-size: 13.5px; line-height: 1.4; }
+
+    .section-box { background: #fff; padding: 30px; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
+    .back-link { background: none; color: var(--brand-light); font-weight: bold; padding: 0; font-size: 14px; cursor: pointer; margin-bottom: 20px; display: inline-block; }
+    .back-link:hover { background: none; text-decoration: underline; }
+    .section-box h2 { margin: 0 0 6px; color: #1f2937; }
+    .hint { color: #64748b; font-size: 13.5px; margin: 0; }
+
+    /* ---------- Banner ---------- */
+    .banner { background: #fef3c7; border: 1px solid #fcd34d; color: #92400e; padding: 12px 16px; border-radius: 8px; font-size: 13.5px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; line-height: 1.45; }
+    .banner button { background: #92400e; font-size: 12px; padding: 7px 12px; }
+    .banner button:hover { background: #78350f; }
+
+    /* ---------- Toolbar ---------- */
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; margin: 18px 0 6px; }
+    .toolbar input[type="search"] { max-width: 300px; flex: 1 1 200px; }
+    .admin-tools { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    /* ---------- Table ---------- */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; margin-top: 10px; font-size: 14px; }
+    th, td { padding: 12px; border-bottom: 1px solid #e5e7eb; white-space: nowrap; }
+    th { background-color: #f8fafc; font-weight: bold; color: #475569; }
+    tbody tr:hover { background-color: #f8fafc; }
+    .btn-action { padding: 5px 10px; font-size: 12px; border-radius: 4px; margin-right: 5px; color: #fff; border: none; font-weight: normal; cursor: pointer; display: inline-block; text-decoration: none; font-family: inherit; }
+    .btn-email { background-color: var(--brand-light); }
+    .btn-email:hover { background-color: #1e40af; }
+    .btn-whatsapp { background-color: #16a34a; }
+    .btn-whatsapp:hover { background-color: #15803d; }
+    .btn-edit { background-color: #d97706; }
+    .btn-edit:hover { background-color: #b45309; }
+    .btn-delete { background-color: #dc2626; }
+    .btn-delete:hover { background-color: #b91c1c; }
+    .pill { font-size: 11px; font-weight: bold; padding: 3px 9px; border-radius: 10px; background: #e0e7ff; color: #3730a3; }
+    .pill.resident { background: #f1f5f9; color: #475569; }
+    .empty { text-align: center; color: #94a3b8; padding: 28px; }
+
+    .error-msg { color: #dc2626; font-size: 14px; font-weight: bold; margin: 15px 0 0; }
+
+    /* ---------- Modal ---------- */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,.55); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 100; }
+    .modal { background: #fff; border-radius: 12px; padding: 26px; width: 100%; max-width: 440px; box-shadow: 0 20px 40px rgba(0,0,0,.25); max-height: 90vh; overflow-y: auto; }
+    .modal h3 { margin: 0 0 18px; color: #1f2937; font-size: 19px; }
+    .modal .form-group { margin-bottom: 14px; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px; }
+
+    @media (max-width: 520px) {
+        .section-box { padding: 20px 16px; }
+        .header-title { font-size: 17px; }
+        .login-box { padding: 28px 22px; }
+        .modal-actions { flex-direction: column-reverse; }
+        .modal-actions button { width: 100%; }
+    }
+</style>
+</head>
+<body>
+
+<!-- ================= 1. LOGIN GATEWAY ================= -->
+<div id="login-screen" class="login-container">
+    <div class="login-box">
+        <h1>Seabird Society</h1>
+        <p class="subtitle">Redevelopment Communication Hub</p>
+
+        <div class="form-group">
+            <label for="login-role">Select Your Role</label>
+            <select id="login-role">
+                <option value="Resident">General Resident (View Only)</option>
+                <option value="Committee">Committee Member (Admin)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="login-passcode">Access Passcode</label>
+            <input type="password" id="login-passcode" placeholder="Enter society passcode" autocomplete="current-password">
+        </div>
+
+        <button onclick="handleLogin()">Log In to Hub</button>
+        <p id="login-error" class="error-msg hidden"></p>
+    </div>
+</div>
+
+<!-- ================= 2. MAIN HUB ================= -->
+<div id="app-wrapper" class="hidden">
+    <header>
+        <div>
+            <div class="header-title">Seabird Society Redevelopment Hub</div>
+            <div id="user-badge" class="badge">Role: Resident</div>
+        </div>
+        <button onclick="handleLogout()" class="logout-btn">Logout</button>
+    </header>
+
+    <main class="main-content">
+
+        <!-- ---------- Dashboard ---------- -->
+        <section id="view-dashboard">
+            <div id="portal-grid" class="grid"></div>
+        </section>
+
+        <!-- ---------- Members Directory ---------- -->
+        <section id="view-members" class="hidden section-box">
+            <button class="back-link" onclick="showView('dashboard')">&larr; Back to Dashboard</button>
+            <h2>Members Directory</h2>
+            <p class="hint">Roster of all society flat allotments and their designated roles.</p>
+
+            <!-- Unsaved-changes warning (admin only, hidden when clean) -->
+            <div id="dirty-banner" class="banner hidden" style="margin-top:18px;">
+                <span>⚠️ You have changes that are <strong>only visible in this browser</strong>. Export <code>members.js</code> and upload it to GitHub so everyone sees them.</span>
+                <span style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <button onclick="exportMembersFile()">Export now</button>
+                    <button onclick="discardLocalChanges()" style="background:#78350f;">Discard</button>
+                </span>
+            </div>
+
+            <div class="toolbar">
+                <input type="search" id="member-search" placeholder="Search by flat, name or role…" oninput="renderMembers()">
+                <div id="admin-tools" class="admin-tools hidden">
+                    <button class="btn-small" onclick="openAddModal()">+ Add Member</button>
+                    <button class="btn-small" onclick="exportMembersFile()">Export members.js</button>
+                    <button class="btn-small" onclick="copyAllEmails()">Copy Emails</button>
+                    <button class="btn-small" onclick="emailCommittee()">Email Committee</button>
+                    <button class="btn-small" onclick="downloadCSV()">Download CSV</button>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Flat No</th>
+                            <th>Member Name</th>
+                            <th>Designated Role</th>
+                            <th>Communication Routes</th>
+                            <th id="actions-header" class="hidden">Admin</th>
+                        </tr>
+                    </thead>
+                    <tbody id="members-table-body"></tbody>
+                </table>
+            </div>
+
+            <p id="member-count" class="hint" style="margin-top:14px;"></p>
+        </section>
+
+    </main>
+</div>
+
+<!-- ================= 3. ADD / EDIT MODAL ================= -->
+<div id="member-modal" class="modal-overlay hidden">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <h3 id="modal-title">Add Member</h3>
+
+        <form id="member-form" onsubmit="saveMember(event)">
+            <div class="form-group">
+                <label for="f-flat">Flat No *</label>
+                <input id="f-flat" type="text" maxlength="10" placeholder="e.g. 302" required>
+            </div>
+
+            <div class="form-group">
+                <label for="f-name">Member Name *</label>
+                <input id="f-name" type="text" maxlength="60" placeholder="e.g. Suresh Kulkarni" required>
+            </div>
+
+            <div class="form-group">
+                <label for="f-role">Designated Role</label>
+                <select id="f-role">
+                    <option value="Resident">Resident</option>
+                    <option value="Committee">Committee</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="f-phone">Mobile Number (10 digits)</label>
+                <input id="f-phone" type="tel" maxlength="15" placeholder="e.g. 9820012345">
+            </div>
+
+            <div class="form-group">
+                <label for="f-email">Email Address</label>
+                <input id="f-email" type="email" maxlength="80" placeholder="e.g. name@email.com">
+            </div>
+
+            <p id="modal-error" class="error-msg hidden"></p>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                <button type="submit">Save Member</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- =========================================================
+     OPTIONAL DATA FILE
+     If members.js is present next to index.html, it defines
+     window.SEABIRD_ROSTER and takes priority over the seed
+     list below. It is safe if this file is missing (404).
+     ========================================================= -->
+<script src="members.js"></script>
+
+<script>
+/* =========================================================
+   1. CONFIGURATION  —  EDIT THIS SECTION
+   ========================================================= */
+
+const SOCIETY = {
+    name: "Seabird Society",
+    countryCode: "91"          // India. Used to build WhatsApp links.
+};
+
+/* --- Access passcodes -------------------------------------------------
+   ⚠️  SOFT GATE ONLY. Anyone who views the page source can read these.
+   It keeps casual visitors out but is NOT real security.
+   -------------------------------------------------------------------- */
+const ACCESS_CODES = {
+    "resident123": { role: "Resident",  label: "General Resident (View Only)", isAdmin: false },
+    "admin123":    { role: "Committee", label: "Committee Member (Admin)",     isAdmin: true  }
+};
+
+/* --- Dashboard tiles -------------------------------------------------- */
+const PORTALS = [
+    { icon: "👥", title: "Members Directory",
+      desc: "Contact roster and designated roles for society members.",
+      action: "members" },
+
+    { icon: "📢", title: "Notices & Circulars",
+      desc: "Urgent alerts, rolling letters, and circular announcements.",
+      url: "https://drive.google.com/drive/folders/1peb7bdtLvFWfghIPmwjQATqxyofun3jt?usp=drive_link" },
+
+    { icon: "📁", title: "Documents & MOM",
+      desc: "Official tenders, builder agreements, and Minutes of Meetings.",
+      url: "https://drive.google.com/drive/folders/1OmcB44LPqg09AE_kRPQK4mN609BDr37c?usp=drive_link" },
+
+    { icon: "✉️", title: "Member Correspondence",
+      desc: "Official letters dispatched to or received from society members.",
+      url: "https://drive.google.com/drive/folders/1PNn075FK79tzEGAsLC3Yw8i5n-SEW9jL?usp=drive_link" },
+
+    { icon: "🏗️", title: "PMC Desk",
+      desc: "Project Management Consultant briefs and audit parameters.",
+      url: "https://drive.google.com/drive/folders/171PfYp0tFet5Tf_ISv7eRjr72vULCI8M?usp=drive_link" },
+
+    { icon: "🏢", title: "Developer / Builder Portal",
+      desc: "Commercial proposals, building plans, and structural updates.",
+      url: "https://drive.google.com/drive/folders/1DWtm6exE5Xoj-y3I9wNmpuZ9lgLI8Cmd?usp=drive_link" },
+
+    { icon: "🏛️", title: "Govt & Municipal Tracking",
+      desc: "IOD trackings, municipal notices, and statutory file requests.",
+      url: "https://drive.google.com/drive/folders/1ZMp9sNxyS4hWQPAwbRqNrmN0vTi671wo?usp=drive_link" }
+];
+
+/* --- Fallback seed roster --------------------------------------------
+   Used only if members.js is missing. You can either edit this list
+   directly, or use the in-app Add/Edit buttons and export members.js.
+   -------------------------------------------------------------------- */
+const SEED_ROSTER = [
+    { flat: "101", name: "Ramesh Shah",    role: "Committee", phone: "9820012345", email: "ramesh@email.com" },
+    { flat: "102", name: "Amina Shaikh",   role: "Resident",  phone: "9820054321", email: "amina@email.com"  },
+    { flat: "201", name: "Vasant More",    role: "Committee", phone: "9819900112", email: "vasant@email.com" },
+    { flat: "202", name: "Kiran Patel",    role: "Resident",  phone: "9833344455", email: "kiran@email.com"  },
+    { flat: "301", name: "Devendra Joshi", role: "Resident",  phone: "9821122334", email: "joshi@email.com"  }
+];
+
+/* =========================================================
+   2. APPLICATION LOGIC  —  no need to edit below this line
+   ========================================================= */
+
+const LS_KEY = "seabirdRoster";
+
+let session       = { loggedIn: false, isAdmin: false, roleLabel: "" };
+let roster        = [];   // current working copy (may include local edits)
+let publishedRoster = []; // what the deployed members.js / seed contains
+let editingId     = null; // id being edited, or null when adding
+
+/* ---------- Small helpers ---------- */
+function esc(str) {
+    return String(str ?? "").replace(/[&<>"']/g, c =>
+        ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+function uid() {
+    return "m" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+function byFlat(a, b) {
+    return a.flat.localeCompare(b.flat, undefined, { numeric: true, sensitivity: "base" });
+}
+
+function normalise(list) {
+    return (list || []).map(m => ({
+        id:    m.id || uid(),
+        flat:  String(m.flat  ?? "").trim(),
+        name:  String(m.name  ?? "").trim(),
+        role:  String(m.role  ?? "").toLowerCase() === "committee" ? "Committee" : "Resident",
+        phone: String(m.phone ?? "").replace(/\D/g, ""),
+        email: String(m.email ?? "").trim()
+    }));
+}
+
+function downloadFile(filename, content, mime) {
+    const blob = new Blob([content], { type: mime + ";charset=utf-8" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/* ---------- Login / Logout ---------- */
+function showLoginError(message) {
+    const el = document.getElementById("login-error");
+    el.textContent = message;
+    el.classList.remove("hidden");
+}
+
+function handleLogin() {
+    const roleSelected = document.getElementById("login-role").value;
+    const code         = document.getElementById("login-passcode").value.trim();
+
+    document.getElementById("login-error").classList.add("hidden");
+
+    if (!code) {
+        showLoginError("Please enter the access passcode.");
+        return;
+    }
+
+    const account = ACCESS_CODES[code];
+
+    if (!account || account.role !== roleSelected) {
+        document.getElementById("login-passcode").value = "";
+        showLoginError("Incorrect passcode for the selected role. Please try again.");
+        return;
+    }
+
+    session = { loggedIn: true, isAdmin: account.isAdmin, roleLabel: account.label };
+    try { sessionStorage.setItem("seabirdSession", JSON.stringify(session)); } catch (e) {}
+
+    document.getElementById("login-passcode").value = "";
+    enterHub();
+}
+
+function handleLogout() {
+    session = { loggedIn: false, isAdmin: false, roleLabel: "" };
+    try { sessionStorage.removeItem("seabirdSession"); } catch (e) {}
+
+    document.getElementById("app-wrapper").classList.add("hidden");
+    document.getElementById("login-screen").classList.remove("hidden");
+    document.getElementById("login-role").value = "Resident";
+    document.getElementById("login-error").classList.add("hidden");
+}
+
+function restoreSession() {
+    try {
+        const saved = JSON.parse(sessionStorage.getItem("seabirdSession") || "null");
+        if (saved && saved.loggedIn) {
+            session = saved;
+            enterHub();
+        }
+    } catch (e) { /* ignore corrupt storage */ }
+}
+
+function enterHub() {
+    document.getElementById("login-screen").classList.add("hidden");
+    document.getElementById("app-wrapper").classList.remove("hidden");
+
+    document.getElementById("user-badge").textContent = "Role: " + session.roleLabel;
+
+    document.querySelectorAll("#admin-tools").forEach(el =>
+        el.classList.toggle("hidden", !session.isAdmin));
+
+    document.getElementById("actions-header").classList.toggle("hidden", !session.isAdmin);
+
+    showView("dashboard");
+}
+
+/* ---------- View router ---------- */
+function showView(name) {
+    document.getElementById("view-dashboard").classList.toggle("hidden", name !== "dashboard");
+    document.getElementById("view-members").classList.toggle("hidden", name !== "members");
+
+    if (name === "members") renderMembers();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+/* ---------- Dashboard tiles ---------- */
+function renderPortals() {
+    const grid = document.getElementById("portal-grid");
+
+    grid.innerHTML = PORTALS.map(p => {
+        const inner = `<div class="card-icon">${p.icon}</div>
+                       <h3>${esc(p.title)}</h3>
+                       <p>${esc(p.desc)}</p>`;
+
+        if (p.action === "members") {
+            return `<div class="card" role="button" tabindex="0"
+                         onclick="showView('members')"
+                         onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showView('members');}">
+                        ${inner}
+                    </div>`;
+        }
+        return `<a class="card" href="${esc(p.url)}" target="_blank" rel="noopener">${inner}</a>`;
+    }).join("");
+}
+
+/* ---------- Roster persistence ---------- */
+function loadLocalRoster() {
+    try {
+        const raw = localStorage.getItem(LS_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? normalise(parsed) : null;
+    } catch (e) { return null; }
+}
+
+function saveLocalRoster() {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(roster)); } catch (e) {}
+}
+
+function isDirty() {
+    const a = roster.slice().sort(byFlat).map(m => [m.flat, m.name, m.role, m.phone, m.email].join("|"));
+    const b = publishedRoster.slice().sort(byFlat).map(m => [m.flat, m.name, m.role, m.phone, m.email].join("|"));
+    return JSON.stringify(a) !== JSON.stringify(b);
+}
+
+function renderBanner() {
+    const el = document.getElementById("dirty-banner");
+    if (el) el.classList.toggle("hidden", !(session.isAdmin && isDirty()));
+}
+
+/* ---------- Members directory ---------- */
+function renderMembers() {
+    const query = (document.getElementById("member-search").value || "").trim().toLowerCase();
+
+    const list = roster
+        .filter(m =>
+            !query ||
+            m.flat.toLowerCase().includes(query) ||
+            m.name.toLowerCase().includes(query) ||
+            m.role.toLowerCase().includes(query))
+        .sort(byFlat);
+
+    const tbody   = document.getElementById("members-table-body");
+    const colSpan = session.isAdmin ? 5 : 4;
+
+    if (!list.length) {
+        tbody.innerHTML = `<tr><td colspan="${colSpan}" class="empty">No members match “${esc(query)}”.</td></tr>`;
+    } else {
+        tbody.innerHTML = list.map(m => {
+            const waNumber  = SOCIETY.countryCode + String(m.phone).replace(/\D/g, "");
+            const waText    = encodeURIComponent(
+                `Hello ${m.name}, this is regarding the ${SOCIETY.name} redevelopment project.`);
+            const roleClass = m.role === "Committee" ? "" : " resident";
+
+            const adminCell = session.isAdmin
+                ? `<td>
+                       <button class="btn-action btn-edit"   onclick="openEditModal('${m.id}')">Edit</button>
+                       <button class="btn-action btn-delete" onclick="deleteMember('${m.id}')">Delete</button>
+                   </td>`
+                : "";
+
+            const contactCell = (m.phone || m.email)
+                ? `${m.email ? `<a class="btn-action btn-email" href="mailto:${esc(m.email)}">Email</a>` : ""}
+                   ${m.phone ? `<a class="btn-action btn-whatsapp" href="https://wa.me/${waNumber}?text=${waText}" target="_blank" rel="noopener">WhatsApp</a>` : ""}`
+                : `<span class="hint">—</span>`;
+
+            return `<tr>
+                <td><strong>${esc(m.flat)}</strong></td>
+                <td>${esc(m.name)}</td>
+                <td><span class="pill${roleClass}">${esc(m.role)}</span></td>
+                <td>${contactCell}</td>
+                ${adminCell}
+            </tr>`;
+        }).join("");
+    }
+
+    document.getElementById("member-count").textContent =
+        `Showing ${list.length} of ${roster.length} members.`;
+
+    renderBanner();
+}
+
+/* ---------- Add / Edit modal ---------- */
+function openAddModal() {
+    editingId = null;
+    document.getElementById("modal-title").textContent = "Add Member";
+    document.getElementById("member-form").reset();
+    document.getElementById("f-role").value = "Resident";
+    document.getElementById("modal-error").classList.add("hidden");
+    document.getElementById("member-modal").classList.remove("hidden");
+    setTimeout(() => document.getElementById("f-flat").focus(), 60);
+}
+
+function openEditModal(id) {
+    const m = roster.find(x => x.id === id);
+    if (!m) return;
+
+    editingId = id;
+    document.getElementById("modal-title").textContent = "Edit Member — Flat " + m.flat;
+    document.getElementById("f-flat").value  = m.flat;
+    document.getElementById("f-name").value  = m.name;
+    document.getElementById("f-role").value  = m.role;
+    document.getElementById("f-phone").value = m.phone;
+    document.getElementById("f-email").value = m.email;
+    document.getElementById("modal-error").classList.add("hidden");
+    document.getElementById("member-modal").classList.remove("hidden");
+    setTimeout(() => document.getElementById("f-name").focus(), 60);
+}
+
+function closeModal() {
+    document.getElementById("member-modal").classList.add("hidden");
+    editingId = null;
+}
+
+function saveMember(e) {
+    e.preventDefault();
+
+    const flat  = document.getElementById("f-flat").value.trim();
+    const name  = document.getElementById("f-name").value.trim();
+    const role  = document.getElementById("f-role").value;
+    const phone = document.getElementById("f-phone").value.replace(/\D/g, "");
+    const email = document.getElementById("f-email").value.trim();
+
+    const errEl = document.getElementById("modal-error");
+    const fail  = msg => { errEl.textContent = msg; errEl.classList.remove("hidden"); };
+    errEl.classList.add("hidden");
+
+    if (!flat) return fail("Flat number is required.");
+    if (!name) return fail("Member name is required.");
+
+    const clash = roster.find(m =>
+        m.flat.toLowerCase() === flat.toLowerCase() && m.id !== editingId);
+    if (clash) return fail(`Flat ${flat} is already assigned to ${clash.name}.`);
+
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+        return fail("Please enter a valid email address.");
+
+    if (phone && phone.length !== 10)
+        return fail("Mobile number should be exactly 10 digits.");
+
+    if (editingId) {
+        const m = roster.find(x => x.id === editingId);
+        if (m) Object.assign(m, { flat, name, role, phone, email });
+    } else {
+        roster.push({ id: uid(), flat, name, role, phone, email });
+    }
+
+    saveLocalRoster();
+    closeModal();
+    renderMembers();
+}
+
+function deleteMember(id) {
+    const m = roster.find(x => x.id === id);
+    if (!m) return;
+
+    if (!confirm(`Delete ${m.name} (Flat ${m.flat}) from the directory?\n\nThis cannot be undone.`))
+        return;
+
+    roster = roster.filter(x => x.id !== id);
+    saveLocalRoster();
+    renderMembers();
+}
+
+/* ---------- Export / discard ---------- */
+function exportMembersFile() {
+    const sorted = roster.slice().sort(byFlat);
+
+    const body = sorted.map(m =>
+        `    { flat: ${JSON.stringify(m.flat)}, name: ${JSON.stringify(m.name)}, ` +
+        `role: ${JSON.stringify(m.role)}, phone: ${JSON.stringify(m.phone)}, ` +
+        `email: ${JSON.stringify(m.email)} }`
+    ).join(",\n");
+
+    const content =
+`// Seabird Society — Members Roster
+// Exported ${new Date().toLocaleString()}
+// Upload this file to your GitHub repo, next to index.html.
+
+window.SEABIRD_ROSTER = [
+${body}
+];
+`;
+
+    downloadFile("members.js", content, "text/javascript");
+
+    publishedRoster = roster.map(m => ({ ...m }));
+    renderBanner();
+
+    alert(
+        "members.js has been downloaded.\n\n" +
+        "Next step: upload it to your GitHub repository (replacing the old one) " +
+        "so that all residents see these changes."
+    );
+}
+
+function discardLocalChanges() {
+    if (!confirm("Discard all local edits and restore the published roster?")) return;
+    roster = publishedRoster.map(m => ({ ...m }));
+    try { localStorage.removeItem(LS_KEY); } catch (e) {}
+    renderMembers();
+}
+
+/* ---------- Admin utilities ---------- */
+function copyAllEmails() {
+    const emails = roster.map(m => m.email).filter(Boolean).join(", ");
+    if (!emails) { alert("No email addresses in the roster."); return; }
+
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(emails)
+            .then(() => alert(`Copied ${emails.split(",").length} email addresses.`))
+            .catch(() => prompt("Copy the addresses below:", emails));
+    } else {
+        prompt("Copy the addresses below:", emails);
+    }
+}
+
+function emailCommittee() {
+    const emails = roster.filter(m => m.role === "Committee" && m.email).map(m => m.email);
+    if (!emails.length) { alert("No committee members with email addresses found."); return; }
+
+    const subject = encodeURIComponent(`${SOCIETY.name} — Redevelopment Update`);
+    window.location.href = `mailto:?bcc=${emails.join(",")}&subject=${subject}`;
+}
+
+function downloadCSV() {
+    const cell = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
+    const rows = [
+        ["Flat No", "Member Name", "Role", "Phone", "Email"],
+        ...roster.slice().sort(byFlat).map(m => [m.flat, m.name, m.role, m.phone, m.email])
+    ];
+    const csv  = rows.map(r => r.map(cell).join(",")).join("\r\n");
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+    const url  = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `seabird-members-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+}
+
+/* ---------- Boot ---------- */
+document.addEventListener("DOMContentLoaded", () => {
+    // Published roster = whatever members.js supplied, else the seed list.
+    const source = Array.isArray(window.SEABIRD_ROSTER) ? window.SEABIRD_ROSTER : SEED_ROSTER;
+    publishedRoster = normalise(source);
+
+    // Working roster = local edits if any, otherwise the published version.
+    roster = loadLocalRoster() || publishedRoster.map(m => ({ ...m }));
+
+    renderPortals();
+
+    document.getElementById("login-passcode")
+        .addEventListener("keydown", e => { if (e.key === "Enter") handleLogin(); });
+
+    // Close the modal with Escape, or by clicking the dark backdrop.
+    document.addEventListener("keydown", e => {
+        if (e.key === "Escape" && !document.getElementById("member-modal").classList.contains("hidden"))
+            closeModal();
+    });
+    document.getElementById("member-modal").addEventListener("click", e => {
+        if (e.target.id === "member-modal") closeModal();
+    });
+
+    restoreSession();
+});
+</script>
+</body>
+</html>
