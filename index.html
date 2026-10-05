@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seabird Society Redevelopment Hub</title>
+<style>
+    :root { --brand: #1e3a8a; --brand-light: #2563eb; }
+    * { box-sizing: border-box; }
+    body { font-family: Arial, Helvetica, sans-serif; background-color: #f0f2f5; color: #333; margin: 0; padding: 0; }
+    .hidden { display: none !important; }
+
+    /* ---------- Login ---------- */
+    .login-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .login-box { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,.1); max-width: 400px; width: 100%; border: 1px solid #e4e6eb; text-align: center; margin: auto; }
+    h1 { color: var(--brand); margin: 0 0 5px; font-size: 26px; }
+    .subtitle { color: #65676b; font-size: 14px; margin: 0 0 25px; }
+    .form-group { text-align: left; margin-bottom: 15px; }
+    label { display: block; font-weight: bold; font-size: 14px; margin-bottom: 5px; color: #4b5563; }
+    select, input { width: 100%; padding: 12px; border: 1px solid #ccd0d5; border-radius: 8px; background-color: #f5f6f7; font-size: 15px; font-family: inherit; }
+    select:focus, input:focus { outline: 2px solid var(--brand-light); outline-offset: 1px; background: #fff; }
+    .login-box > button { width: 100%; margin-top: 5px; }
+
+    /* ---------- Buttons ---------- */
+    button { background-color: #1d4ed8; color: #fff; padding: 10px 20px; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; font-family: inherit; }
+    button:hover { background-color: #1e40af; }
+    .logout-btn { background-color: #111827; }
+    .logout-btn:hover { background-color: #374151; }
+    .btn-small { padding: 8px 12px; font-size: 13px; background-color: #475569; }
+    .btn-small:hover { background-color: #334155; }
+    .btn-secondary { background: #e5e7eb; color: #374151; }
+    .btn-secondary:hover { background: #d1d5db; }
+
+    /* ---------- Header ---------- */
+    header { background-color: var(--brand); color: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; box-shadow: 0 2px 4px rgba(0,0,0,.1); }
+    .header-title { font-size: 20px; font-weight: bold; margin: 0; }
+    .badge { display: inline-block; background-color: var(--brand-light); color: #fff; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-top: 5px; }
+
+    /* ---------- Layout ---------- */
+    .main-content { max-width: 1100px; margin: 30px auto 60px; padding: 0 20px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    .card { background: #fff; padding: 25px; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 2px 4px rgba(0,0,0,.05); text-decoration: none; color: inherit; display: block; transition: transform .15s, box-shadow .15s; cursor: pointer; }
+    .card:hover, .card:focus { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.1); outline: none; border-color: #c7d2fe; }
+    .card-icon { font-size: 30px; margin-bottom: 10px; }
+    .card h3 { margin: 0 0 5px; color: #1f2937; font-size: 18px; }
+    .card p { margin: 0; color: #6b7280; font-size: 13.5px; line-height: 1.4; }
+
+    .section-box { background: #fff; padding: 30px; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
+    .back-link { background: none; color: var(--brand-light); font-weight: bold; padding: 0; font-size: 14px; cursor: pointer; margin-bottom: 20px; display: inline-block; }
+    .back-link:hover { background: none; text-decoration: underline; }
+    .section-box h2 { margin: 0 0 6px; color: #1f2937; }
+    .hint { color: #64748b; font-size: 13.5px; margin: 0; }
+
+    /* ---------- Banner ---------- */
+    .banner { background: #fef3c7; border: 1px solid #fcd34d; color: #92400e; padding: 12px 16px; border-radius: 8px; font-size: 13.5px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; line-height: 1.45; }
+    .banner button { background: #92400e; font-size: 12px; padding: 7px 12px; }
+    .banner button:hover { background: #78350f; }
+
+    /* ---------- Toolbar ---------- */
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; margin: 18px 0 6px; }
+    .toolbar input[type="search"] { max-width: 300px; flex: 1 1 200px; }
+    .admin-tools { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    /* ---------- Table ---------- */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; margin-top: 10px; font-size: 14px; }
+    th, td { padding: 12px; border-bottom: 1px solid #e5e7eb; white-space: nowrap; }
+    th { background-color: #f8fafc; font-weight: bold; color: #475569; }
+    tbody tr:hover { background-color: #f8fafc; }
+    .btn-action { padding: 5px 10px; font-size: 12px; border-radius: 4px; margin-right: 5px; color: #fff; border: none; font-weight: normal; cursor: pointer; display: inline-block; text-decoration: none; font-family: inherit; }
+    .btn-email { background-color: var(--brand-light); }
+    .btn-email:hover { background-color: #1e40af; }
+    .btn-whatsapp { background-color: #16a34a; }
+    .btn-whatsapp:hover { background-color: #15803d; }
+    .btn-edit { background-color: #d97706; }
+    .btn-edit:hover { background-color: #b45309; }
+    .btn-delete { background-color: #dc2626; }
+    .btn-delete:hover { background-color: #b91c1c; }
+    .pill { font-size: 11px; font-weight: bold; padding: 3px 9px; border-radius: 10px; background: #e0e7ff; color: #3730a3; }
+    .pill.resident { background: #f1f5f9; color: #475569; }
+    .empty { text-align: center; color: #94a3b8; padding: 28px; }
+
+    .error-msg { color: #dc2626; font-size: 14px; font-weight: bold; margin: 15px 0 0; }
+
+    /* ---------- Modal ---------- */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,.55); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 100; }
+    .modal { background: #fff; border-radius: 12px; padding: 26px; width: 100%; max-width: 440px; box-shadow: 0 20px 40px rgba(0,0,0,.25); max-height: 90vh; overflow-y: auto; }
+    .modal h3 { margin: 0 0 18px; color: #1f2937; font-size: 19px; }
+    .modal .form-group { margin-bottom: 14px; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px; }
+
+    /* =========================================================
+       TIMELINE STYLES
+       ========================================================= */
+    .tl-card {
+        --tl-green:#16a34a; --tl-green-bg:#dcfce7;
+        --tl-blue:#2563eb;  --tl-blue-bg:#dbeafe;
+        --tl-red:#dc2626;   --tl-red-bg:#fee2e2;
+        --tl-gray:#94a3b8;  --tl-gray-bg:#f1f5f9;
+        --tl-text:#0f172a;  --tl-muted:#64748b; --tl-line:#e2e8f0;
+        background:#fff; border:1px solid var(--tl-line);
+        border-radius:16px; padding:28px 28px 32px;
+        color: var(--tl-text);
+    }
+    .tl-header-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+    .tl-card h1{font-size:20px;color:var(--tl-text);margin:0}
+    .tl-updated{font-size:12.5px;color:var(--tl-muted)}
+    .tl-progress{height:8px;background:var(--tl-gray-bg);border-radius:99px;margin:14px 0 6px;overflow:hidden}
+    .tl-progress-fill{height:100%;background:var(--tl-blue);border-radius:99px;transition:width .5s}
+    .tl-progress-label{font-size:12.5px;color:var(--tl-muted);margin:0}
+
+    .tl-list{list-style:none;padding:22px 0 0;margin:0}
+    .tl-item{position:relative;padding:0 0 26px 52px}
+    .tl-item:last-child{padding-bottom:4px}
+    .tl-item::after{content:"";position:absolute;left:10px;top:29px;bottom:-2px;
+                    width:2px;background:var(--tl-line);border-radius:2px}
+    .tl-item.completed::after{background:var(--tl-green)}
+    .tl-item:last-child::after{display:none}
+
+    .tl-node{position:absolute;left:0;top:2px;width:22px;height:22px;border-radius:50%;
+             background:#fff;border:2px solid var(--tl-gray);
+             display:flex;align-items:center;justify-content:center;
+             font-size:12px;font-weight:700;color:#fff;box-shadow:0 0 0 4px #fff}
+    .tl-item.completed .tl-node{background:var(--tl-green);border-color:var(--tl-green)}
+    .tl-item.in_progress .tl-node{background:var(--tl-blue);border-color:var(--tl-blue);animation:tl-pulse 2s infinite}
+    .tl-item.delayed .tl-node{background:var(--tl-red);border-color:var(--tl-red)}
+    @keyframes tl-pulse{
+        0%  {box-shadow:0 0 0 4px #fff,0 0 0 6px rgba(37,99,235,.30)}
+        70% {box-shadow:0 0 0 4px #fff,0 0 0 14px rgba(37,99,235,0)}
+        100%{box-shadow:0 0 0 4px #fff,0 0 0 6px rgba(37,99,235,0)}
+    }
+
+    .tl-head{display:flex;width:100%;align-items:flex-start;justify-content:space-between;gap:12px;
+             background:none;border:0;padding:0;cursor:pointer;font:inherit;color:inherit;text-align:left}
+    .tl-head:hover .tl-title{opacity:.75}
+    .tl-head:focus-visible,.tl-notify:focus-visible{outline:2px solid var(--tl-blue);outline-offset:3px}
+    .tl-title{font-size:15px;font-weight:600;line-height:1.35;display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:var(--tl-text)}
+    .tl-summary{display:block;font-size:12.5px;color:var(--tl-muted);margin-top:3px}
+    .tl-side{display:flex;align-items:center;gap:8px;flex-shrink:0;padding-top:1px}
+    .tl-date{font-size:12.5px;color:var(--tl-muted);white-space:nowrap}
+    .tl-chev{color:var(--tl-muted);flex-shrink:0;transition:transform .25s}
+    .tl-item.open .tl-chev{transform:rotate(180deg)}
+
+    .tl-chip{font-size:10.5px;font-weight:700;letter-spacing:.3px;padding:2px 8px;border-radius:99px;text-transform:uppercase}
+    .tl-chip.completed{background:var(--tl-green-bg);color:#15803d}
+    .tl-chip.in_progress{background:var(--tl-blue-bg);color:#1d4ed8}
+    .tl-chip.upcoming{background:var(--tl-gray-bg);color:var(--tl-muted)}
+    .tl-chip.delayed{background:var(--tl-red-bg);color:#b91c1c}
+
+    .tl-details{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s ease}
+    .tl-details>div{overflow:hidden}
+    .tl-item.open .tl-details{grid-template-rows:1fr}
+    .tl-details-inner{padding:12px 0 2px;font-size:13.5px;color:#334155}
+    .tl-docs{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+    .tl-doc{font-size:12.5px;color:var(--tl-blue);text-decoration:none;background:var(--tl-blue-bg);padding:4px 10px;border-radius:8px}
+    .tl-doc:hover{text-decoration:underline}
+    .tl-updates{list-style:none;margin-top:12px;border-top:1px dashed var(--tl-line);padding-top:10px;padding-left:0}
+    .tl-updates li{font-size:12.5px;color:var(--tl-muted);padding:3px 0}
+    .tl-updates b{color:var(--tl-text);font-weight:600}
+    .tl-notify{margin-top:12px;font-size:12.5px;font-weight:600;cursor:pointer;padding:7px 14px;
+               border-radius:8px;border:1px solid var(--tl-blue);background:#fff;color:var(--tl-blue)}
+    .tl-notify:hover{background:var(--tl-blue-bg)}
+    .tl-notify.on{background:var(--tl-blue);color:#fff}
+
+    @media (max-width:560px) {
+        .section-box { padding: 20px 16px; }
+        .header-title { font-size: 17px; }
+        .login-box { padding: 28px 22px; }
+        .modal-actions { flex-direction: column-reverse; }
+        .modal-actions button { width: 100%; }
+        .tl-card{padding:20px 16px 24px}
+        .tl-item{padding-left:40px}
+        .tl-side{flex-direction:column;align-items:flex-end;gap:2px}
+    }
+</style>
+</head>
+<body>
+
+<!-- ================= 1. LOGIN GATEWAY ================= -->
+<div id="login-screen" class="login-container">
+    <div class="login-box">
+        <h1>Seabird Society</h1>
+        <p class="subtitle">Redevelopment Communication Hub</p>
+
+        <div class="form-group">
+            <label for="login-role">Select Your Role</label>
+            <select id="login-role">
+                <option value="Resident">General Resident (View Only)</option>
+                <option value="Committee">Committee Member (Admin)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="login-passcode">Access Passcode</label>
+            <input type="password" id="login-passcode" placeholder="Enter society passcode" autocomplete="current-password">
+        </div>
+
+        <button id="login-btn">Log In to Hub</button>
+        <p id="login-error" class="error-msg hidden"></p>
+    </div>
+</div>
+
+<!-- ================= 2. MAIN HUB ================= -->
+<div id="app-wrapper" class="hidden">
+    <header>
+        <div>
+            <div class="header-title">Seabird Society Redevelopment Hub</div>
+            <div id="user-badge" class="badge">Role: Resident</div>
+        </div>
+        <button id="logout-btn" class="logout-btn">Logout</button>
+    </header>
+
+    <main class="main-content">
+
+        <!-- ---------- Dashboard ---------- -->
+        <section id="view-dashboard">
+            <div id="portal-grid" class="grid"></div>
+        </section>
+
+        <!-- ---------- Members Directory ---------- -->
+        <section id="view-members" class="hidden section-box">
+            <button class="back-link" data-nav="dashboard">&larr; Back to Dashboard</button>
+            <h2>Members Directory</h2>
+            <p class="hint">Roster of all society flat allotments and their designated roles.</p>
+
+            <div id="dirty-banner" class="banner hidden" style="margin-top:18px;">
+                <span>You have changes that are <strong>only visible in this browser</strong>. Export <code>members.js</code> and upload it to GitHub so everyone sees them.</span>
+                <span style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <button id="export-now-btn">Export now</button>
+                    <button id="discard-btn" style="background:#78350f;">Discard</button>
+                </span>
+            </div>
+
+            <div class="toolbar">
+                <input type="search" id="member-search" placeholder="Search by flat, name or role...">
+                <div id="admin-tools" class="admin-tools hidden">
+                    <button class="btn-small" id="add-member-btn">+ Add Member</button>
+                    <button class="btn-small" id="export-members-btn">Export members.js</button>
+                    <button class="btn-small" id="copy-emails-btn">Copy Emails</button>
+                    <button class="btn-small" id="email-committee-btn">Email Committee</button>
+                    <button class="btn-small" id="download-csv-btn">Download CSV</button>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Flat No</th>
+                            <th>Member Name</th>
+                            <th>Designated Role</th>
+                            <th>Communication Routes</th>
+                            <th id="actions-header" class="hidden">Admin</th>
+                        </tr>
+                    </thead>
+                    <tbody id="members-table-body"></tbody>
+                </table>
+            </div>
+
+            <p id="member-count" class="hint" style="margin-top:14px;"></p>
+        </section>
+
+        <!-- ---------- Redevelopment Timeline ---------- -->
+        <section id="view-timeline" class="hidden section-box">
+            <button class="back-link" data-nav="dashboard">&larr; Back to Dashboard</button>
+            <h2 style="margin-bottom:18px;">Redevelopment Timeline</h2>
+
+            <div class="tl-card">
+                <div id="tl-header"></div>
+                <ol id="tl-timeline" class="tl-list"></ol>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<!-- ================= 3. ADD / EDIT MODAL ================= -->
+<div id="member-modal" class="modal-overlay hidden">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <h3 id="modal-title">Add Member</h3>
+
+        <form id="member-form">
+            <div class="form-group">
+                <label for="f-flat">Flat No *</label>
+                <input id="f-flat" type="text" maxlength="10" placeholder="e.g. 302" required>
+            </div>
+
+            <div class="form-group">
+                <label for="f-name">Member Name *</label>
+                <input id="f-name" type="text" maxlength="60" placeholder="e.g. Suresh Kulkarni" required>
+            </div>
+
+            <div class="form-group">
+                <label for="f-role">Designated Role</label>
+                <select id="f-role">
+                    <option value="Resident">Resident</option>
+                    <option value="Committee">Committee</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="f-phone">Mobile Number (10 digits)</label>
+                <input id="f-phone" type="tel" maxlength="15" placeholder="e.g. 9820012345">
+            </div>
+
+            <div class="form-group">
+                <label for="f-email">Email Address</label>
+                <input id="f-email" type="email" maxlength="80" placeholder="e.g. name@email.com">
+            </div>
+
+            <p id="modal-error" class="error-msg hidden"></p>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" id="modal-cancel-btn">Cancel</button>
+                <button type="submit">Save Member</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+/* =========================================================
+   1. CONFIGURATION
+   ========================================================= */
+
+var SOCIETY = {
+    name: "Seabird Society",
+    countryCode: "91"
+};
+
+var ACCESS_CODES = {
+    "resident123": { role: "Resident",  label: "General Resident (View Only)", isAdmin: false },
+    "admin123":    { role: "Committee", label: "Committee Member (Admin)",     isAdmin: true  }
+};
+
+var PORTALS = [
+    { icon: "C", title: "Redevelopment Timeline",
+      desc: "Live milestone tracker - consent, approvals, construction, handover.",
+      action: "timeline" },
+
+    { icon: "M", title: "Members Directory",
+      desc: "Contact roster and designated roles for society members.",
+      action: "members" },
+
+    { icon: "N", title: "Notices & Circulars",
+      desc: "Urgent alerts, rolling letters, and circular announcements.",
+      url: "https://drive.google.com/drive/folders/1peb7bdtLvFWfghIPmwjQATqxyofun3jt?usp=drive_link" },
+
+    { icon: "D", title: "Documents & MOM",
+      desc: "Official tenders, builder agreements, and Minutes of Meetings.",
+      url: "https://drive.google.com/drive/folders/1OmcB44LPqg09AE_kRPQK4mN609BDr37c?usp=drive_link" },
+
+    { icon: "C", title: "Member Correspondence",
+      desc: "Official letters dispatched to or received from society members.",
+      url: "https://drive.google.com/drive/folders/1PNn075FK79tzEGAsLC3Yw8i5n-SEW9jL?usp=drive_link" },
+
+    { icon: "P", title: "PMC Desk",
+      desc: "Project Management Consultant briefs and audit parameters.",
+      url: "https://drive.google.com/drive/folders/171PfYp0tFet5Tf_ISv7eRjr72vULCI8M?usp=drive_link" },
+
+    { icon: "B", title: "Developer / Builder Portal",
+      desc: "Commercial proposals, building plans, and structural updates.",
+      url: "https://drive.google.com/drive/folders/1DWtm6exE5Xoj-y3I9wNmpuZ9lgLI8Cmd?usp=drive_link" },
+
+    { icon: "G", title: "Govt & Municipal Tracking",
+      desc: "IOD trackings, municipal notices, and statutory file requests.",
+      url: "https://drive.google.com/drive/folders/1ZMp9sNxyS4hWQPAwbRqNrmN0vTi671wo?usp=drive_link" }
+];
+
+var SEED_ROSTER = [
+    { flat: "101", name: "Ramesh Shah",    role: "Committee", phone: "9820012345", email: "ramesh@email.com" },
+    { flat: "102", name: "Amina Shaikh",   role: "Resident",  phone: "9820054321", email: "amina@email.com"  },
+    { flat: "201", name: "Vasant More",    role: "Committee", phone: "9819900112", email: "vasant@email.com" },
+    { flat: "202", name: "Kiran Patel",    role: "Resident",  phone: "9833344455", email: "kiran@email.com"  },
+    { flat: "301", name: "Devendra Joshi", role: "Resident",  phone: "9821122334", email: "joshi@email.com"  }
+];
+
+/* =========================================================
+   TIMELINE DATA  —  Revised master schedule
+   Last revised: 3 Oct 2025
+   ========================================================= */
+var TL_LAST_UPDATED = "3 Oct 2026";
+
+var TIMELINE = [
+  {
+    title: "General body approval for feasibility study",
+    status: "completed",
+    date: "Sep 2026",
+    summary: "Approved at AGM",
+    description: "Society general body approved the proposal to conduct a feasibility study for redevelopment. This is the formal starting point of the project.",
+    documents: [
+      { name: "AGM resolution.pdf", url: "#" }
+    ],
+    updates: [
+      { date: "20 Sep 2026", text: "Approved at AGM" }
+    ]
+  },
+  {
+    title: "Feasibility study and acceptance",
+    status: "upcoming",
+    date: "Dec 2026",
+    summary: "Study to be commissioned and report accepted by the society",
+    description: "A Project Management Consultant (PMC) will carry out a feasibility study covering FSI utilisation, cost estimates, and member benefits. The report must be accepted by the society before proceeding.",
+    documents: []
+  },
+  {
+    title: "General body resolution & consent",
+    status: "upcoming",
+    date: "Jan 2027",
+    summary: "Formal society resolution and member consent",
+    description: "A special GBM will be convened to pass the redevelopment resolution and collect written consent from members — typically requires 51% or 75% depending on society bylaws.",
+    documents: []
+  },
+  {
+    title: "PMC / architect / legal appointment",
+    status: "upcoming",
+    date: "Apr 2027",
+    summary: "Appointment of project consultants and legal advisors",
+    description: "Society formally appoints a Project Management Consultant, an architect, and a legal advisor. Tenders or direct appointments are decided by the managing committee.",
+    documents: []
+  },
+  {
+    title: "Freehold conversion & title clearance",
+    status: "upcoming",
+    date: "Jun 2027",
+    summary: "Collector's office conversion and clean title",
+    description: "Application to the Collector for conversion from leasehold to freehold. Requires scrutiny, assessment, payment of conversion charges, issuance of freehold order, and registration/mutation.",
+    documents: []
+  },
+  {
+    title: "Tender, developer selection & agreement",
+    status: "upcoming",
+    date: "Jul 2027",
+    summary: "Competitive bidding, developer selection and DA signing",
+    description: "Preparation of tender documents, invitation of bids, evaluation, negotiation of LOI/commercial terms, member approval, and execution of the Development Agreement (DA) with the selected developer.",
+    documents: []
+  },
+  {
+    title: "Municipal approvals (IOD to CC)",
+    status: "upcoming",
+    date: "Sep 2027",
+    summary: "IOD submission, Intimation of Approval, and Commencement Certificate",
+    description: "The architect submits the building proposal to the municipal corporation for Intimation of Disapproval (IOD). After compliance, the Intimation of Approval (IOA) is issued, followed by the Commencement Certificate (CC) that permits construction to begin.",
+    documents: []
+  },
+  {
+    title: "Vacate & move to transit housing",
+    status: "upcoming",
+    date: "Nov 2027",
+    summary: "Members shift to transit accommodation",
+    description: "Members vacate their flats and move into transit housing arranged by the developer. Rent agreements, deposits, and shifting support are handled in this phase.",
+    documents: []
+  },
+  {
+    title: "Demolition & site clearance",
+    status: "upcoming",
+    date: "Dec 2027",
+    summary: "Existing structure demolished; site cleared and ready",
+    description: "The existing building is demolished after all members have vacated. The site is cleared of debris and prepared for foundation work.",
+    documents: []
+  },
+  {
+    title: "Construction (foundation to finishing)",
+    status: "upcoming",
+    date: "Dec 2027 - Dec 2029",
+    summary: "~24 months from foundation to finishing",
+    description: "Main construction phase: foundations, plinth, RCC structure, masonry, plaster, waterproofing, MEP first-fix, common area finishes, external works, and landscaping. Progress photos and slab-by-slab updates will be posted here.",
+    documents: []
+  },
+  {
+    title: "OC, handover & possession",
+    status: "upcoming",
+    date: "Apr 2030",
+    summary: "Occupancy Certificate, flat allotment, keys and move-in",
+    description: "Authority inspection and Occupancy Certificate (OC) issuance. Followed by flat allotment to members, handover of keys, and formal possession.",
+    documents: []
+  }
+];
+
+/* =========================================================
+   2. APPLICATION LOGIC
+   ========================================================= */
+
+var LS_KEY = "seabirdRoster";
+var session = { loggedIn: false, isAdmin: false, roleLabel: "" };
+var roster = [];
+var publishedRoster = [];
+var editingId = null;
+
+function esc(str) {
+    return String(str == null ? "" : str).replace(/[&<>"']/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+}
+
+function uid() {
+    return "m" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+function byFlat(a, b) {
+    return a.flat.localeCompare(b.flat, undefined, { numeric: true, sensitivity: "base" });
+}
+
+function normalise(list) {
+    return (list || []).map(function (m) {
+        return {
+            id:    m.id || uid(),
+            flat:  String(m.flat  == null ? "" : m.flat).trim(),
+            name:  String(m.name  == null ? "" : m.name).trim(),
+            role:  String(m.role  == null ? "" : m.role).toLowerCase() === "committee" ? "Committee" : "Resident",
+            phone: String(m.phone == null ? "" : m.phone).replace(/\D/g, ""),
+            email: String(m.email == null ? "" : m.email).trim()
+        };
+    });
+}
+
+function downloadFile(filename, content, mime) {
+    var blob = new Blob([content], { type: mime + ";charset=utf-8" });
+    var url  = URL.createObjectURL(blob);
+    var a    = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+}
+
+/* ---------- Login / Logout ---------- */
+function showLoginError(message) {
+    var el = document.getElementById("login-error");
+    el.textContent = message;
+    el.classList.remove("hidden");
+}
+
+function handleLogin() {
+    var roleSelected = document.getElementById("login-role").value;
+    var code         = document.getElementById("login-passcode").value.trim();
+
+    document.getElementById("login-error").classList.add("hidden");
+
+    if (!code) {
+        showLoginError("Please enter the access passcode.");
+        return;
+    }
+
+    var account = ACCESS_CODES[code];
+
+    if (!account || account.role !== roleSelected) {
+        document.getElementById("login-passcode").value = "";
+        showLoginError("Incorrect passcode for the selected role. Please try again.");
+        return;
+    }
+
+    session = { loggedIn: true, isAdmin: account.isAdmin, roleLabel: account.label };
+    try { sessionStorage.setItem("seabirdSession", JSON.stringify(session)); } catch (e) {}
+
+    document.getElementById("login-passcode").value = "";
+    enterHub();
+}
+
+function handleLogout() {
+    session = { loggedIn: false, isAdmin: false, roleLabel: "" };
+    try { sessionStorage.removeItem("seabirdSession"); } catch (e) {}
+
+    document.getElementById("app-wrapper").classList.add("hidden");
+    document.getElementById("login-screen").classList.remove("hidden");
+    document.getElementById("login-role").value = "Resident";
+    document.getElementById("login-error").classList.add("hidden");
+}
+
+function restoreSession() {
+    try {
+        var saved = JSON.parse(sessionStorage.getItem("seabirdSession") || "null");
+        if (saved && saved.loggedIn) {
+            session = saved;
+            enterHub();
+        }
+    } catch (e) {}
+}
+
+function enterHub() {
+    document.getElementById("login-screen").classList.add("hidden");
+    document.getElementById("app-wrapper").classList.remove("hidden");
+
+    document.getElementById("user-badge").textContent = "Role: " + session.roleLabel;
+
+    var adminEls = document.querySelectorAll("#admin-tools");
+    for (var i = 0; i < adminEls.length; i++) {
+        adminEls[i].classList.toggle("hidden", !session.isAdmin);
+    }
+
+    document.getElementById("actions-header").classList.toggle("hidden", !session.isAdmin);
+
+    showView("dashboard");
+}
+
+/* ---------- View router ---------- */
+function showView(name) {
+    document.getElementById("view-dashboard").classList.toggle("hidden", name !== "dashboard");
+    document.getElementById("view-members").classList.toggle("hidden", name !== "members");
+    document.getElementById("view-timeline").classList.toggle("hidden", name !== "timeline");
+
+    if (name === "members") renderMembers();
+    if (name === "timeline") renderTimeline();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+/* ---------- Dashboard tiles ---------- */
+function renderPortals() {
+    var grid = document.getElementById("portal-grid");
+    var html = "";
+
+    for (var i = 0; i < PORTALS.length; i++) {
+        var p = PORTALS[i];
+        var inner = '<div class="card-icon">' + esc(p.icon) + '</div>' +
+                    '<h3>' + esc(p.title) + '</h3>' +
+                    '<p>' + esc(p.desc) + '</p>';
+
+        if (p.action) {
+            html += '<div class="card" role="button" tabindex="0" data-nav="' + esc(p.action) + '">' + inner + '</div>';
+        } else {
+            html += '<a class="card" href="' + esc(p.url) + '" target="_blank" rel="noopener">' + inner + '</a>';
+        }
+    }
+
+    grid.innerHTML = html;
+}
+
+/* =========================================================   TIMELINE RENDERING
+   ========================================================= */
+var TL_LABEL = {completed:"Completed", in_progress:"In progress", upcoming:"Upcoming", delayed:"Delayed"};
+var TL_ICON  = {completed:"&#10003;", in_progress:"", delayed:"!", upcoming:""};
+var TL_CHEVRON = '<svg class="tl-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+
+function renderTimelineHeader() {
+    var total = TIMELINE.length;
+    var done  = 0;
+    for (var i = 0; i < TIMELINE.length; i++) {
+        if (TIMELINE[i].status === "completed") done++;
+    }
+    var pct = Math.round(done / total * 100);
+    document.getElementById("tl-header").innerHTML =
+        '<div class="tl-header-top">' +
+            '<h1>Redevelopment timeline</h1>' +
+            '<span class="tl-updated">Last updated ' + TL_LAST_UPDATED + '</span>' +
+        '</div>' +
+        '<div class="tl-progress"><div class="tl-progress-fill" style="width:' + pct + '%"></div></div>' +
+        '<p class="tl-progress-label">' + done + ' of ' + total + ' milestones complete &middot; ' + pct + '%</p>';
+}
+
+function tlItemHTML(step) {
+    var open  = (step.status === "in_progress" || step.status === "delayed");
+
+    var docs = "";
+    var nDocs = 0;
+    if (step.documents && step.documents.length) {
+        nDocs = step.documents.length;
+        for (var i = 0; i < step.documents.length; i++) {
+            var d = step.documents[i];
+            docs += '<a class="tl-doc" href="' + esc(d.url) + '">' + esc(d.name) + '</a>';
+        }
+    }
+
+    var updates = "";
+    if (step.updates && step.updates.length) {
+        for (var j = 0; j < step.updates.length; j++) {
+            var u = step.updates[j];
+            updates += '<li><b>' + esc(u.date) + '</b> &mdash; ' + esc(u.text) + '</li>';
+        }
+    }
+
+    var dateLabel = step.status === "completed" ? step.date : "Est. " + step.date;
+    var notify = step.status === "in_progress"
+        ? '<button class="tl-notify" type="button">Notify me about this stage</button>'
+        : "";
+
+    return '<li class="tl-item ' + step.status + (open ? ' open' : '') + '">' +
+        '<span class="tl-node" aria-hidden="true">' + (TL_ICON[step.status] || "") + '</span>' +
+        '<button class="tl-head" type="button" aria-expanded="' + open + '">' +
+            '<span>' +
+                '<span class="tl-title">' + esc(step.title) +
+                    '<span class="tl-chip ' + step.status + '">' + TL_LABEL[step.status] + '</span>' +
+                '</span>' +
+                (step.summary
+                    ? '<span class="tl-summary">' + esc(step.summary) +
+                      (nDocs ? ' &middot; ' + nDocs + ' doc' + (nDocs > 1 ? 's' : '') : '') +
+                      '</span>'
+                    : '') +
+            '</span>' +
+            '<span class="tl-side">' +
+                '<span class="tl-date">' + esc(dateLabel) + '</span>' +
+                TL_CHEVRON +
+            '</span>' +
+        '</button>' +
+        '<div class="tl-details"><div>' +
+            '<div class="tl-details-inner">' +
+                (step.description ? '<p>' + esc(step.description) + '</p>' : '') +
+                (docs ? '<div class="tl-docs">' + docs + '</div>' : '') +
+                (updates ? '<ul class="tl-updates">' + updates + '</ul>' : '') +
+                notify +
+            '</div>' +
+        '</div></div>' +
+    '</li>';
+}
+
+function renderTimeline() {
+    renderTimelineHeader();
+    var html = "";
+    for (var i = 0; i < TIMELINE.length; i++) {
+        html += tlItemHTML(TIMELINE[i]);
+    }
+    document.getElementById("tl-timeline").innerHTML = html;
+}
+
+/* ---------- Roster persistence ---------- */
+function loadLocalRoster() {
+    try {
+        var raw = localStorage.getItem(LS_KEY);
+        if (!raw) return null;
+        var parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? normalise(parsed) : null;
+    } catch (e) { return null; }
+}
+
+function saveLocalRoster() {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(roster)); } catch (e) {}
+}
+
+function isDirty() {
+    var a = roster.slice().sort(byFlat).map(function (m) {
+        return [m.flat, m.name, m.role, m.phone, m.email].join("|");
+    });
+    var b = publishedRoster.slice().sort(byFlat).map(function (m) {
+        return [m.flat, m.name, m.role, m.phone, m.email].join("|");
+    });
+    return JSON.stringify(a) !== JSON.stringify(b);
+}
+
+function renderBanner() {
+    var el = document.getElementById("dirty-banner");
+    if (el) el.classList.toggle("hidden", !(session.isAdmin && isDirty()));
+}
+
+/* ---------- Members directory ---------- */
+function renderMembers() {
+    var query = (document.getElementById("member-search").value || "").trim().toLowerCase();
+
+    var list = roster.filter(function (m) {
+        if (!query) return true;
+        return m.flat.toLowerCase().indexOf(query) !== -1 ||
+               m.name.toLowerCase().indexOf(query) !== -1 ||
+               m.role.toLowerCase().indexOf(query) !== -1;
+    }).sort(byFlat);
+
+    var tbody   = document.getElementById("members-table-body");
+    var colSpan = session.isAdmin ? 5 : 4;
+
+    if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="' + colSpan + '" class="empty">No members match.</td></tr>';
+    } else {
+        var html = "";
+        for (var i = 0; i < list.length; i++) {
+            var m = list[i];
+            var waNumber  = SOCIETY.countryCode + String(m.phone).replace(/\D/g, "");
+            var waText    = encodeURIComponent("Hello " + m.name + ", this is regarding the " + SOCIETY.name + " redevelopment project.");
+            var roleClass = m.role === "Committee" ? "" : " resident";
+
+            var adminCell = session.isAdmin
+                ? '<td>' +
+                    '<button class="btn-action btn-edit" data-edit="' + m.id + '">Edit</button>' +
+                    '<button class="btn-action btn-delete" data-del="' + m.id + '">Delete</button>' +
+                  '</td>'
+                : "";
+
+            var contactCell = (m.phone || m.email)
+                ? (m.email ? '<a class="btn-action btn-email" href="mailto:' + esc(m.email) + '">Email</a>' : "") +
+                  (m.phone ? '<a class="btn-action btn-whatsapp" href="https://wa.me/' + waNumber + '?text=' + waText + '" target="_blank" rel="noopener">WhatsApp</a>' : "")
+                : '<span class="hint">&mdash;</span>';
+
+            html += '<tr>' +
+                '<td><strong>' + esc(m.flat) + '</strong></td>' +
+                '<td>' + esc(m.name) + '</td>' +
+                '<td><span class="pill' + roleClass + '">' + esc(m.role) + '</span></td>' +
+                '<td>' + contactCell + '</td>' +
+                adminCell +
+            '</tr>';
+        }
+        tbody.innerHTML = html;
+    }
+
+    document.getElementById("member-count").textContent =
+        "Showing " + list.length + " of " + roster.length + " members.";
+
+    renderBanner();
+}
+
+/* ---------- Add / Edit modal ---------- */
+function openAddModal() {
+    editingId = null;
+    document.getElementById("modal-title").textContent = "Add Member";
+    document.getElementById("member-form").reset();
+    document.getElementById("f-role").value = "Resident";
+    document.getElementById("modal-error").classList.add("hidden");
+    document.getElementById("member-modal").classList.remove("hidden");
+    setTimeout(function () { document.getElementById("f-flat").focus(); }, 60);
+}
+
+function openEditModal(id) {
+    var m = null;
+    for (var i = 0; i < roster.length; i++) if (roster[i].id === id) m = roster[i];
+    if (!m) return;
+
+    editingId = id;
+    document.getElementById("modal-title").textContent = "Edit Member - Flat " + m.flat;
+    document.getElementById("f-flat").value  = m.flat;
+    document.getElementById("f-name").value  = m.name;
+    document.getElementById("f-role").value  = m.role;
+    document.getElementById("f-phone").value = m.phone;
+    document.getElementById("f-email").value = m.email;
+    document.getElementById("modal-error").classList.add("hidden");
+    document.getElementById("member-modal").classList.remove("hidden");
+    setTimeout(function () { document.getElementById("f-name").focus(); }, 60);
+}
+
+function closeModal() {
+    document.getElementById("member-modal").classList.add("hidden");
+    editingId = null;
+}
+
+function saveMember(e) {
+    e.preventDefault();
+
+    var flat  = document.getElementById("f-flat").value.trim();
+    var name  = document.getElementById("f-name").value.trim();
+    var role  = document.getElementById("f-role").value;
+    var phone = document.getElementById("f-phone").value.replace(/\D/g, "");
+    var email = document.getElementById("f-email").value.trim();
+
+    var errEl = document.getElementById("modal-error");
+    function fail(msg) { errEl.textContent = msg; errEl.classList.remove("hidden"); }
+    errEl.classList.add("hidden");
+
+    if (!flat) { fail("Flat number is required."); return; }
+    if (!name) { fail("Member name is required."); return; }
+
+    for (var i = 0; i < roster.length; i++) {
+        if (roster[i].flat.toLowerCase() === flat.toLowerCase() && roster[i].id !== editingId) {
+            fail("Flat " + flat + " is already assigned to " + roster[i].name + ".");
+            return;
+        }
+    }
+
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        fail("Please enter a valid email address.");
+        return;
+    }
+
+    if (phone && phone.length !== 10) {
+        fail("Mobile number should be exactly 10 digits.");
+        return;
+    }
+
+    if (editingId) {
+        for (var j = 0; j < roster.length; j++) {
+            if (roster[j].id === editingId) {
+                roster[j].flat  = flat;
+                roster[j].name  = name;
+                roster[j].role  = role;
+                roster[j].phone = phone;
+                roster[j].email = email;
+                break;
+            }
+        }
+    } else {
+        roster.push({ id: uid(), flat: flat, name: name, role: role, phone: phone, email: email });
+    }
+
+    saveLocalRoster();
+    closeModal();
+    renderMembers();
+}
+
+function deleteMember(id) {
+    var m = null;
+    for (var i = 0; i < roster.length; i++) if (roster[i].id === id) m = roster[i];
+    if (!m) return;
+
+    if (!confirm("Delete " + m.name + " (Flat " + m.flat + ") from the directory?\n\nThis cannot be undone.")) return;
+
+    roster = roster.filter(function (x) { return x.id !== id; });
+    saveLocalRoster();
+    renderMembers();
+}
+
+/* ---------- Export / discard ---------- */
+function exportMembersFile() {
+    var sorted = roster.slice().sort(byFlat);
+
+    var body = sorted.map(function (m) {
+        return "    { flat: " + JSON.stringify(m.flat) + ", name: " + JSON.stringify(m.name) +
+               ", role: " + JSON.stringify(m.role) + ", phone: " + JSON.stringify(m.phone) +
+               ", email: " + JSON.stringify(m.email) + " }";
+    }).join(",\n");
+
+    var content =
+"// Seabird Society - Members Roster\n" +
+"// Exported " + new Date().toLocaleString() + "\n" +
+"// Upload this file to your GitHub repo, next to index.html.\n\n" +
+"window.SEABIRD_ROSTER = [\n" + body + "\n];\n";
+
+    downloadFile("members.js", content, "text/javascript");
+
+    publishedRoster = roster.map(function (m) {
+        return { id: m.id, flat: m.flat, name: m.name, role: m.role, phone: m.phone, email: m.email };
+    });
+    renderBanner();
+
+    alert("members.js has been downloaded.\n\nNext step: upload it to your GitHub repository (replacing the old one) so that all residents see these changes.");
+}
+
+function discardLocalChanges() {
+    if (!confirm("Discard all local edits and restore the published roster?")) return;
+    roster = publishedRoster.map(function (m) {
+        return { id: m.id, flat: m.flat, name: m.name, role: m.role, phone: m.phone, email: m.email };
+    });
+    try { localStorage.removeItem(LS_KEY); } catch (e) {}
+    renderMembers();
+}
+
+/* ---------- Admin utilities ---------- */
+function copyAllEmails() {
+    var emails = roster.map(function (m) { return m.email; }).filter(Boolean).join(", ");
+    if (!emails) { alert("No email addresses in the roster."); return; }
+
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(emails).then(function () {
+            alert("Copied " + emails.split(",").length + " email addresses.");
+        }).catch(function () {
+            prompt("Copy the addresses below:", emails);
+        });
+    } else {
+        prompt("Copy the addresses below:", emails);
+    }
+}
+
+function emailCommittee() {
+    var emails = roster.filter(function (m) { return m.role === "Committee" && m.email; })
+                       .map(function (m) { return m.email; });
+    if (!emails.length) { alert("No committee members with email addresses found."); return; }
+
+    var subject = encodeURIComponent(SOCIETY.name + " - Redevelopment Update");
+    window.location.href = "mailto:?bcc=" + emails.join(",") + "&subject=" + subject;
+}
+
+function downloadCSV() {
+    function cell(v) { return '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"'; }
+    var rows = [["Flat No", "Member Name", "Role", "Phone", "Email"]];
+    roster.slice().sort(byFlat).forEach(function (m) {
+        rows.push([m.flat, m.name, m.role, m.phone, m.email]);
+    });
+    var csv  = rows.map(function (r) { return r.map(cell).join(","); }).join("\r\n");
+    var blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+    var url  = URL.createObjectURL(blob);
+
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "seabird-members-" + new Date().toISOString().slice(0, 10) + ".csv";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+}
+
+/* =========================================================
+   3. EVENT WIRING + BOOT
+   ========================================================= */
+document.addEventListener("DOMContentLoaded", function () {
+
+    var source = Array.isArray(window.SEABIRD_ROSTER) ? window.SEABIRD_ROSTER : SEED_ROSTER;
+    publishedRoster = normalise(source);
+    roster = loadLocalRoster() || publishedRoster.map(function (m) {
+        return { id: m.id, flat: m.flat, name: m.name, role: m.role, phone: m.phone, email: m.email };
+    });
+
+    renderPortals();
+
+    /* ---- Login screen ---- */
+    document.getElementById("login-btn").addEventListener("click", handleLogin);
+    document.getElementById("login-passcode").addEventListener("keydown", function (e) {
+        if (e.key === "Enter") handleLogin();
+    });
+
+    /* ---- Logout ---- */
+    document.getElementById("logout-btn").addEventListener("click", handleLogout);
+
+    /* ---- Global click delegation for nav + timeline + member actions ---- */
+    document.addEventListener("click", function (e) {
+        var navEl = e.target.closest("[data-nav]");
+        if (navEl) {
+            showView(navEl.getAttribute("data-nav"));
+            return;
+        }
+
+        var editEl = e.target.closest("[data-edit]");
+        if (editEl) {
+            openEditModal(editEl.getAttribute("data-edit"));
+            return;
+        }
+
+        var delEl = e.target.closest("[data-del]");
+        if (delEl) {
+            deleteMember(delEl.getAttribute("data-del"));
+            return;
+        }
+
+        /* Timeline: notify button */
+        var notifyBtn = e.target.closest(".tl-notify");
+        if (notifyBtn) {
+            notifyBtn.classList.toggle("on");
+            notifyBtn.textContent = notifyBtn.classList.contains("on")
+                ? "Notifications on - we will alert you"
+                : "Notify me about this stage";
+            return;
+        }
+
+        /* Timeline: expand/collapse */
+        var head = e.target.closest(".tl-head");
+        if (head) {
+            var item = head.closest(".tl-item");
+            var isOpen = item.classList.toggle("open");
+            head.setAttribute("aria-expanded", isOpen);
+        }
+    });
+
+    /* ---- Keyboard: Enter/Space on dashboard cards ---- */
+    document.addEventListener("keydown", function (e) {
+        if (e.key !== "Enter" && e.key !== " ") return;
+        var card = e.target.closest('.card[data-nav]');
+        if (card) {
+            e.preventDefault();
+            showView(card.getAttribute("data-nav"));
+        }
+    });
+
+    /* ---- Members screen controls ---- */
+    document.getElementById("member-search").addEventListener("input", renderMembers);
+    document.getElementById("add-member-btn").addEventListener("click", openAddModal);
+    document.getElementById("export-members-btn").addEventListener("click", exportMembersFile);
+    document.getElementById("export-now-btn").addEventListener("click", exportMembersFile);
+    document.getElementById("discard-btn").addEventListener("click", discardLocalChanges);
+    document.getElementById("copy-emails-btn").addEventListener("click", copyAllEmails);
+    document.getElementById("email-committee-btn").addEventListener("click", emailCommittee);
+    document.getElementById("download-csv-btn").addEventListener("click", downloadCSV);
+
+    /* ---- Modal controls ---- */
+    document.getElementById("member-form").addEventListener("submit", saveMember);
+    document.getElementById("modal-cancel-btn").addEventListener("click", closeModal);
+    document.getElementById("member-modal").addEventListener("click", function (e) {
+        if (e.target.id === "member-modal") closeModal();
+    });
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && !document.getElementById("member-modal").classList.contains("hidden")) {
+            closeModal();
+        }
+    });
+
+    /* ---- Restore prior session ---- */
+    restoreSession();
+});
+</script>
+</body>
+</html>
